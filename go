@@ -1,0 +1,1 @@
+./mf mapfile outfile
