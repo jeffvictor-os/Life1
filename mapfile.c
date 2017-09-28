@@ -40,7 +40,6 @@ int readmapfile (char *file, char *mymap[], int *xdim, int *ydim) {
 
       // Allocate enough pointers for the "rows" which are implemented 
       // as strings. Also allocate the strings.
-//    mymap = malloc (*ydim * sizeof(char *));
       for (int i=0; i < *ydim; i++) {
         if ((mymap[i]= (char *) malloc (*xdim)) == (char *) NULL) { FAIL; }
       }
@@ -48,8 +47,6 @@ int readmapfile (char *file, char *mymap[], int *xdim, int *ydim) {
 
     // Remove trailing newline.
     line[len-1] = '\0';
-//  printf ("Retrieved line %d of length %zu :\n", ++numoflines, read-1);
-//  printf ("%s", line);
     for (int i=0; i < *xdim; i++) 
       for (int j=0; j < *ydim; j++) mymap[i][j] = line[j];
   }
@@ -95,12 +92,6 @@ void main(int argc, char *argv[])
  
   // Check command line.
   if (argc != 3) { printf ("Usage: readmapfile <infile> <outfile>\n"); exit (0); }
-
-  // Allocate map. 
-//for (int row=0; row<xdim; row++) {
-//  map[row] = (char *) malloc((size_t) DIM+1);
-//  if (map[row] == NULL) { FAIL; } 
-//}
 
   // Read file.
   if (! readmapfile (argv[1], map, &xdim, &ydim))
