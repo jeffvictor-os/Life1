@@ -1,4 +1,4 @@
-// READMAPFILE: supporting functions to read a file into a 2-D map, and
+// MAPFILE: supporting functions to read a file into a 2-D map, and
 // write such a map into a file.
 //
 // Assumes that the length of all of the lines are the same, and that 
@@ -6,25 +6,27 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <strings.h>
+// Solaris: #include <strings.h>
+#include <string.h>
 
-#include "life.h"
-// Pointer to Map
-//#define DIM 64
-//char *map[DIM];
+#include "lifeglobals.h"
+// In-memory map
+// #define DIM 64
+// char *map[DIM];
 
-#define FAIL exit(0);
+#define FAIL printf ("Help!\n"); exit(0);
 
-int readmapfile (char *file, char *mymap[], int *xdim, int *ydim) {
+int readmapfile (char *file, char *mymap[], int *rowdim, int *coldim) {
 
   char *buffer;
   char    *line = NULL;
-  int      numoflines=0;
+  int      c=0, r=0, numoflines=0;
   size_t   len=0;
   ssize_t  read;
   FILE    *fp;
 
-  *xdim = *ydim= 0;
+  // "c" is columns. "r" is rows.
+  *coldim = *rowdim= 0;
 
   // Open file. Fail with zero.
   fp = fopen (file, "r");
@@ -33,28 +35,21 @@ int readmapfile (char *file, char *mymap[], int *xdim, int *ydim) {
   // Read lines, test each one.
   // Later, size map based on length of first line and number of lines.
   while ((read = getline (&line, &len, fp)) != -1) {
-    // With the first line, we can calculate the map dimensions.
-    // Then we can allocate space for the pointers to each string, and the strings.
-    if (*xdim==0) {
-      *xdim= *ydim= strlen (line) -1;
+    // Determine (square) map dimensions from first line.
+    if   (*rowdim==0) *coldim= *rowdim= strlen(line)-1;
 
-      // Allocate enough pointers for the "rows" which are implemented 
-      // as strings. Also allocate the strings.
-      for (int i=0; i < *ydim; i++) {
-        if ((mymap[i]= (char *) malloc (*xdim)) == (char *) NULL) { FAIL; }
-      }
-    }
+    //   Check import format for subsequent lines.
+    else if (strlen(line) != *rowdim+1) { FAIL; }
+  
+    // Remove trailing newline, allocate string, copy.
+    line[*coldim] = '\0';
+    if ((mymap[r]= (char *) malloc (*coldim)) == (char *) NULL) { FAIL; }
+    strcpy (mymap[r], line);
 
-    // Remove trailing newline.
-    line[len-1] = '\0';
-    for (int i=0; i < *xdim; i++) 
-      for (int j=0; j < *ydim; j++) mymap[i][j] = line[j];
+    r++;    // Do next row.
   }
 
-  // This assumes that the last line is the same length as the rest.
-
   if (ferror(fp)) { FAIL; }
-
   free   (line);
   fclose (fp);
 
@@ -64,47 +59,22 @@ int readmapfile (char *file, char *mymap[], int *xdim, int *ydim) {
 
 // Write the map to a file; useful for replaying multiple generations.
 // 
-int writemapfile (char *file, char *mymap[], int xdim, int ydim) {
-  FILE    *fp;
+int writemapfile (char *file, char *mymap[], int rowdim, int coldim) {
+  int   r=0;
+  FILE *fp;
 
   // Open file. Fail with zero.
   fp = fopen (file, "w");
   if (fp == NULL) { FAIL; }
   
-  for (int i=0; i<xdim; i++) {
-    fputs (mymap[i], fp);
-    fputs ("\n", fp);
+  for (r=0; r<rowdim; r++) {
+    fprintf (fp, "%s\n", mymap[r]);
   }
   fclose (fp);
   return (1);
 }
 
 
-// Display the map to the terminal window.
-int printmap (char *mymap[], int xdim, int ydim) {
-  for (int i=0; i<xdim; i++)  
-     puts (mymap[i]);
-}
-
-void main(int argc, char *argv[])
-{
-  int  xdim=0, ydim=0;
- 
-  // Check command line.
-  if (argc != 3) { printf ("Usage: readmapfile <infile> <outfile>\n"); exit (0); }
-
-  // Read file.
-  if (! readmapfile (argv[1], map, &xdim, &ydim))
-    printf ("Failed.\n");
-  else
-    printf ("Succeeded.\n");
-
-  // Write file.
-  writemapfile (argv[2], map, xdim, ydim);
-
-  // Display map.
-/*printmap (map, xdim, ydim); */
-}
 
 
 
