@@ -1,7 +1,6 @@
-#include <stdio.h>
+// Include file with global declarations.
 
-// Global ptr array to map.
-#define DIM 64
-char *map[DIM];
+char *currmap[], *nextmap[];
+
 
 

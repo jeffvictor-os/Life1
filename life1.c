@@ -16,7 +16,7 @@
 // 4. Make the next generation the current generation
 // 5. Goto 2
 
-#include "life.h"
+#include "lifeglobals.h"
 
 void main (int argc, char *argv[]) {
 
