@@ -7,12 +7,12 @@
 // Solaris: #include <strings.h>
 #include <string.h>
 
+#include "life.h"
 #include "lifeglobals.h"
 // Pointer to Map
 //#define DIM 64
 //char *map[DIM];
 
-#define FAIL printf ("Help!\n"); exit(0);
 
 int readmapfile ();
 int writemapfile ();

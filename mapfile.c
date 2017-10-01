@@ -9,12 +9,21 @@
 // Solaris: #include <strings.h>
 #include <string.h>
 
+#include "life.h"
 #include "lifeglobals.h"
 // In-memory map
 // #define DIM 64
 // char *map[DIM];
 
-#define FAIL printf ("Help!\n"); exit(0);
+// Allocate the DIM quantity of strings that will be used as the map.
+// The calling program can use *either* allocmap() *or* readmapfile()
+// to create the map.
+char **allocmap(char **mymap, int dimension) {
+  int r=0;
+
+  for (r=0; r<dimension; r++)
+    if ((mymap[r]= (char *)malloc (dimension)) == (char *) NULL) { FAIL; }
+}
 
 int readmapfile (char *file, char *mymap[], int *rowdim, int *coldim) {
 

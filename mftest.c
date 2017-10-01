@@ -8,12 +8,12 @@
 #include <stdio.h>
 #include <strings.h>
 
+#include "life.h"
 
 // Pointer to Map
 #define DIM 64
 char *map[DIM];
 
-#define FAIL exit(0);
 
 int readmapfile (char *file, char *mymap[], int *xdim, int *ydim) {
 

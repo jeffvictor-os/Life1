@@ -1,0 +1,10 @@
+Files:
+
+testmapfile: test program to test map file I/O.
+testmapfuncs: test program to test map manipulation routines.
+
+mapfile.c: functions to perform map file I/O.
+mapfuncs.c: map manipulation routines. 
+
+
+
