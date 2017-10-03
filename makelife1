@@ -1,0 +1,2 @@
+#cc -features=extensions -o mf mapfile.c
+cc -std=c99 -D_XOPEN_SOURCE=700 -D__USE_XOPEN2K8 -o life1 mapfuncs.c mapfile.c turn.c life1.c
