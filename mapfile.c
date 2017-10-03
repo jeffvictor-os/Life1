@@ -10,9 +10,8 @@
 #include <string.h>
 
 #include "life.h"
-#include "lifeglobals.h"
 // In-memory map
-// #define DIM 64
+// #define DIM 8
 // char *map[DIM];
 
 // Allocate the DIM quantity of strings that will be used as the map.
@@ -53,7 +52,7 @@ int readmapfile (char *file, char *mymap[], int *rowdim, int *coldim) {
     // Remove trailing newline, allocate string, copy.
     line[*coldim] = '\0';
     if ((mymap[r]= (char *) malloc (*coldim)) == (char *) NULL) { FAIL; }
-    strcpy (mymap[r], line);
+    strncpy (mymap[r], line, DIM);
 
     r++;    // Do next row.
   }
@@ -68,14 +67,16 @@ int readmapfile (char *file, char *mymap[], int *rowdim, int *coldim) {
 
 // Write the map to a file; useful for replaying multiple generations.
 // 
-int writemapfile (char *file, char *mymap[], int rowdim, int coldim) {
+int writemapfile (char *file, int mode, char *mymap[], int rowdim, int coldim, int turn) {
   int   r=0;
   FILE *fp;
 
   // Open file. Fail with zero.
-  fp = fopen (file, "w");
+  if (mode==L_LOG) fp = fopen (file, "a");
+  else             fp = fopen (file, "w");
   if (fp == NULL) { FAIL; }
-  
+ 
+  fprintf (fp, "Turn: %d\n", turn); 
   for (r=0; r<rowdim; r++) {
     fprintf (fp, "%s\n", mymap[r]);
   }

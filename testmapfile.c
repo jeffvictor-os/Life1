@@ -7,10 +7,9 @@
 // Solaris: #include <strings.h>
 #include <string.h>
 
-#include "life.h"
 #include "lifeglobals.h"
 // Pointer to Map
-//#define DIM 64
+//#define DIM 8
 //char *map[DIM];
 
 
@@ -25,20 +24,20 @@ int printmap (char *mymap[], int rowdim, int coldim) {
 
 void main(int argc, char *argv[])
 {
-  int  rowdim=0, coldim=0;
+  int  rowdim=0, coldim=0, turn=0;
  
   // Check command line.
   if (argc != 3) { printf ("Usage: readmapfile <infile> <outfile>\n"); exit (0); }
 
   // Read file.
-  if (! readmapfile (argv[1], map, &rowdim, &coldim))
+  if (! readmapfile (argv[1], currmap, &rowdim, &coldim))
     printf ("Failed.\n");
 
   // Write file.
-  writemapfile (argv[2], map, rowdim, coldim);
+  writemapfile (argv[2], L_OUT, currmap, rowdim, coldim, turn);
 
   // Display map.
-//printmap (map, rowdim, coldim); 
+//printmap (currmap, rowdim, coldim); 
 }
 
 

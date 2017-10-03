@@ -6,7 +6,6 @@
 #include <stdlib.h>
 
 #include "lifeglobals.h"
-#include "life.h"
 
 
 // Args:
@@ -22,27 +21,25 @@ void main (int argc, char *argv[]) {
   cols = atoi(argv[3]);
 
   // Read in test map
-  readmapfile (argv[1], map1, &rows, &cols);
+  readmapfile (argv[1], currmap, &rows, &cols);
 
   // Allocate the other map.
-  allocmap (map2, DIM);
+  allocmap (nextmap, DIM);
 
   // Count naybors of the location specified on the cmd line.
-  naybors =  CountNaybors (map1, rows, cols) ;
+  naybors =  CountNaybors (currmap, rows, cols) ;
 
   printf ("There are %d neighbors of row %d, col %d.\n", 
           naybors, atoi(argv[2]), atoi(argv[3]));
-  currmap = map1;
-  nextmap = map2;
+  p_currmap = currmap;
+  p_nextmap = nextmap;
 
   // Copy one map to the other.
-  CopyUniverse();
-
-  SwitchMaps();
+  CopyUniverse(nextmap, currmap);
 
   // Repeat above, result should be the same: 
   // Count naybors of the location specified on the cmd line.
-  naybors =  CountNaybors (map1, atoi(argv[2]), atoi(argv[3])) ;
+  naybors =  CountNaybors (currmap, atoi(argv[2]), atoi(argv[3])) ;
 
   printf ("There are %d neighbors of row %d, col %d.\n", 
           naybors, atoi(argv[2]), atoi(argv[3]));

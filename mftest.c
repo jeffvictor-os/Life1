@@ -8,12 +8,7 @@
 #include <stdio.h>
 #include <strings.h>
 
-#include "life.h"
-
-// Pointer to Map
-#define DIM 64
-char *map[DIM];
-
+#include "lifeglobals.h"
 
 int readmapfile (char *file, char *mymap[], int *xdim, int *ydim) {
 
@@ -29,7 +24,6 @@ int readmapfile (char *file, char *mymap[], int *xdim, int *ydim) {
   // Open file. Fail with zero.
   fp = fopen (file, "r");
   if (fp == NULL) { FAIL; }
-printf ("rmf: mymap=%d.\n", (int) mymap);
 
   // Read lines, test each one.
   // Later, size map based on length of first line and number of lines.
@@ -44,7 +38,6 @@ printf ("rmf: mymap=%d.\n", (int) mymap);
 //    mymap = malloc (*ydim * sizeof(char *));
       for (int i=0; i < *ydim; i++) {
         if ((mymap[i]= (char *) malloc (*xdim)) == (char *) NULL) { FAIL; }
-printf ("rmf: mymap[%d] = %d.\n", i, (int) mymap[i]);
       }
     }
 
@@ -74,13 +67,8 @@ int writemapfile (char *file, char *mymap[], int xdim, int ydim) {
   fp = fopen (file, "w");
   if (fp == NULL) { FAIL; }
   
-printf ("Mid1 writemapfile.\n");
-printf ("wmf: mymap=%d.\n", (int) mymap);
   for (int i=0; i<xdim; i++) {
-//printf ("Mid2 writemapfile.\n");
-//printf ("wmf: mymap[%d] = %d.\n", i, (int) mymap[i]);
     fputs (mymap[i], fp);
-//printf ("Mid3 writemapfile.\n");
     fputs ("\n", fp);
   }
   fclose (fp);
@@ -108,19 +96,19 @@ void main(int argc, char *argv[])
 //}
 
   // Read file.
-  if (! readmapfile (argv[1], map, &xdim, &ydim))
+  if (! readmapfile (argv[1], map1, &xdim, &ydim))
     printf ("Failed.\n");
   else
     printf ("Succeeded.\n");
 
-printf ("main: map=%d.\n", (int) map);
-printf ("main: map[0]=%d.\n", (int) map[0]);
+printf ("main: map=%d.\n", (int) map1);
+printf ("main: map[0]=%d.\n", (int) map1[0]);
 
   // Write file.
-  writemapfile (argv[2], map, xdim, ydim);
+  writemapfile (argv[2], map1, xdim, ydim);
 
   // Display map.
-/*printmap (map, xdim, ydim); */
+/*printmap (map1, xdim, ydim); */
 }
 
 
