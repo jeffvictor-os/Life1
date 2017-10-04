@@ -1,12 +1,16 @@
 //
 // Life1: Conway's Game of Life.
 //
-// Usage: life1 [-g <gen>]  [-d [-t <time>]] \
+// Usage: life1 [-g <gen>]  [-p [-t <time>]] [-n] \
 //              [-i infile] [-o outfile] [-l logfile]
+//              [-d]
 //        Options:
+//          -d : debug mode
 //          -g <gen>:  Number of generations to run.
 //          -t <time>: Duration of each generation, in hundredths of a second.
 //                     <time> must be an integer
+//          -n  detect a static map ("no" change) and stop, reporting this condition.
+//          -s  report statistics, e.g. number of turns, deaths, births, 
 //          -i <infile>: an ASCII file of the initial pattern; it 
 //          represents each location with a character. A space or '0'
 //          means the location is empty. A '1' means it is occupied.
@@ -16,8 +20,6 @@
 //             generation, with a one-line label between generations.
 //
 // Future:
-//   -n  detect a static map ("no" change) and stop, reporting this condition.
-//   -s  report statistics, e.g. number of turns, deaths, births, 
 //   -m  detect map size from input file.
 //   -? <X>:<Y>  specify map dimensions on command line.
 //
@@ -36,7 +38,7 @@
 #include "lifeglobals.h"
 
 void printusage() {
-  printf ("Usage: life1 [-g <gen>]  [-d [-t <time>]] \
+  printf ("Usage: life1 [-d] [-g <gen>]  [-p [-t <time>]] [-n] [-s] \
  [-i infile] [-o outfile] [-l logfile]\n");
 }
 
@@ -49,18 +51,22 @@ int DisplayMap (char *mymap[], int turn) {
 
 void main (int argc, char *argv[]) {
   char c, infile[80], outfile[80], logfile[80];
-  int  rows=0, cols=0, ts=0;
+  int  rows=0, cols=0, turn=0;
   int  num_gens=20, gen_time=450000000;
-  int  displayGen=0;
+  int  printGen=0, detect_change=0, changed=0, report_stats=0;
   int  tflag=0, iflag=0, oflag=0, lflag=0;
   struct timespec pauz;
+  FILE *fp;
 
   // Handle command-line arguments.
-  while ((c = getopt (argc, argv, "dg:i:l:o:t:")) != -1)
+  while ((c = getopt (argc, argv, "dpg:i:l:no:st:")) != -1)
     switch (c)
     {
       case 'd':
-        displayGen=1;
+        debug=1;
+        break;
+      case 'p':
+        printGen=1;
         break;
       case 'g':
         num_gens=(atoi(optarg));
@@ -74,15 +80,21 @@ void main (int argc, char *argv[]) {
         infile[64]='\0';   // For safety.
         iflag = 1;
         break;
+      case 'l':
+        strncpy (logfile, optarg, 64);
+        logfile[64]='\0';   // For safety.
+        lflag = 1;
+        break;
+      case 'n':
+        detect_change=1;
+        break;
       case 'o':
         strncpy (outfile, optarg, 64);
         outfile[64]='\0';   // For safety.
         oflag = 1;
         break;
-      case 'l':
-        strncpy (logfile, optarg, 64);
-        logfile[64]='\0';   // For safety.
-        lflag = 1;
+      case 's':
+        report_stats=1;
         break;
       case '?':
         { printusage(); FAIL; }
@@ -90,7 +102,7 @@ void main (int argc, char *argv[]) {
     }
 
   // Check for incompatible options.
-  if (tflag && !displayGen) { printusage(); FAIL; }
+  if (tflag && !printGen) { printusage(); FAIL; }
 
   // Set the delay between generations.
   pauz.tv_sec =gen_time/1000000000;
@@ -112,15 +124,27 @@ void main (int argc, char *argv[]) {
   // For the first time, only, copy current to next.
   CopyUniverse(p_nextmap, p_currmap);
 
-  for (ts=1; ts<=num_gens; ts++) {
-    Turn();                                 // Compute next generation.
+  for (turn=1; turn<=num_gens; turn++) {
+    changed=Turn();                         // Compute next generation.
     CopyUniverse(p_currmap, p_nextmap);     // Overwrite curr gen with next.
-    if (displayGen) DisplayMap (p_currmap, ts);
-    if (lflag) { printf ("Logging...\n"); writemapfile (logfile, L_LOG, currmap, DIM, DIM, ts); }
+    if (printGen) DisplayMap (p_currmap, turn);
+    if (lflag) { printf ("Logging...\n"); writemapfile (logfile, L_LOG, currmap, DIM, DIM, turn); }
+    if (detect_change && !changed) {
+      if (printGen) printf ("Turn %d: Map stopped changing.\n", turn);
+      break;
+    }
     nanosleep (&pauz, NULL);
   }
 
-  if (oflag) writemapfile (outfile, L_OUT, currmap, DIM, DIM, ts-1);
+  if (report_stats) {
+    printf ("At turn %d, there had been %d births and %d deaths.\n", births, deaths);
+  }
+
+  if (oflag) {
+    writemapfile (outfile, L_OUT, currmap, DIM, DIM, turn-1);
+    if ((fp = fopen (outfile, "a")) == NULL) { printf ("Couldn't open output file.\n"); FAIL; }
+    fprintf (fp, "Turn %d: Map stopped changing.\n", turn);
+    fclose (fp);
+  }
 
 }
-

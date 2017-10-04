@@ -14,4 +14,5 @@ char *map2[DIM];
 char *currmap[DIM];
 char *nextmap[DIM];
 
-
+int births=0, deaths=0;
+int debug=0;

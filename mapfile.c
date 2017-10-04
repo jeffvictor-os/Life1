@@ -32,6 +32,7 @@ int readmapfile (char *file, char *mymap[], int *rowdim, int *coldim) {
   size_t   len=0;
   ssize_t  read;
   FILE    *fp;
+  extern int debug;
 
   // "c" is columns. "r" is rows.
   *coldim = *rowdim= 0;
@@ -43,11 +44,14 @@ int readmapfile (char *file, char *mymap[], int *rowdim, int *coldim) {
   // Read lines, test each one.
   // Later, size map based on length of first line and number of lines.
   while ((read = getline (&line, &len, fp)) != -1) {
+
     // Determine (square) map dimensions from first line.
     if   (*rowdim==0) *coldim= *rowdim= strlen(line)-1;
 
     //   Check import format for subsequent lines.
-    else if (strlen(line) != *rowdim+1) { FAIL; }
+    else if (strlen(line) != *rowdim+1) 
+      if (debug) 
+        printf ("Import file format not self-consistent.\nExtra characters ignored.\n");
   
     // Remove trailing newline, allocate string, copy.
     line[*coldim] = '\0';

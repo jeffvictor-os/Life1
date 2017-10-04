@@ -2,7 +2,7 @@
 #define DIM 32
 
 #define ALIVE '*'
-#define EMPTY '.'
+#define EMPTY ' '
 
 // Flag for writing the map to a logfile (one map per generation) or just the last gen.
 #define L_LOG 0
